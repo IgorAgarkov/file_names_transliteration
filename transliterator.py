@@ -6,10 +6,14 @@ import re
 
 
 def letter_replacer(word, dic):
+    '''
+    Функция заменяет символы в строке (word) согласно словарю (dic)
+    '''
     for key, value in dic.items():
         word = word.replace(key, value)
     return word
 
+# словарь соответствий символов для замены
 legend = {
     ' ':'_',
     ',':'',
@@ -81,39 +85,35 @@ legend = {
     'Я':'Ya'
     }
 
-
-
-#def file_renamer(extension='dxf', dic=legend):
-    #for filename in os.listdir('.'):
-        #if filename[-4:].lower() == '.' + extension:
-            #new_filename = letter_replacer(filename, dic)
-            #if filename == new_filename:
-                #print(f'{filename} не требует переименования')
-            #else:
-                #os.rename(filename, new_filename)
-                #print(f'{filename} переименован в {new_filename}')
-
-
-
+# словарь с исключениями, содержит паттерн и список ["исходынй_символ", "чем_заменить"]
 exception_patterns = {
     '\dх\d': ['х', 'x'],         # заменяем русскую х на латинскую "икс" в обозначениях размеров, например 200х200 (чтобы не получилось 200h200)
-    'ф\d': ['ф', 'd']            # заменяем русскую ф на латинскую d в обозначениях диаметров, например ф30 (чтобы не получилось f300)
+    'ф\d': ['ф', 'd'],           # заменяем русскую ф на латинскую d в обозначениях диаметров, например ф30 (чтобы не получилось f300)
+    'Н\d': ['Н', 'h']            # заменяем русскую Н на латинскую h в обозначениях высоты, например h30 (чтобы не получилось N300)
 }
 
 def file_renamer(extension='dxf', dic=legend, exception_patterns = None):
+    '''
+    Функция переименовывает файлы в текущей деректории.
+    extension - расширение файла, по умолчанию 'dxf'
+    dic - словарь соответствия символов для замены, по умолчанию legend
+    exception_patterns - словарь исключений, по умолчанию None
+    '''
     for filename in os.listdir('.'):
-        if filename[-4:].lower() == '.' + extension:
+        if filename[-4:].lower() == '.' + extension:                                               # проверяем расширение 
             old_filename = filename
-            if exception_patterns != None:
+            if exception_patterns != None:                                                         # если указан словарь исключение, сначала отрабатываем его
                 for key, value in exception_patterns.items():
                     search_key = re.search(key, old_filename)
-                    if search_key:
+                    if search_key:                                                                 # если нашлись паттерны, меняем символы в паттернах
                         replacement_part = search_key.group().replace(value[0], value[1])
-                        old_filename = old_filename.replace(search_key.group(), replacement_part)
-            new_filename = letter_replacer(old_filename, dic)
+                        old_filename = old_filename.replace(search_key.group(), replacement_part)  # меняем найденный паттерн в имени файла
+            new_filename = letter_replacer(old_filename, dic)                                      # новое имя для файла через словарь соответствия 
             if filename == new_filename:
                 print(f'{filename} не требует переименования')
             else:
-                os.rename(filename, new_filename)
+                os.rename(filename, new_filename)                                                  # переименовываем файл
 
+
+#
 file_renamer(exception_patterns=exception_patterns)
