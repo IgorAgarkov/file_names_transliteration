@@ -4,15 +4,6 @@
 import os
 import re
 
-
-def letter_replacer(word, dic):
-    '''
-    Функция заменяет символы в строке (word) согласно словарю (dic)
-    '''
-    for key, value in dic.items():
-        word = word.replace(key, value)
-    return word
-
 # словарь соответствий символов для замены
 legend = {
     ' ':'_',
@@ -92,6 +83,16 @@ exception_patterns = {
     'Н\d': ['Н', 'h']            # заменяем русскую Н на латинскую h в обозначениях высоты, например h30 (чтобы не получилось N300)
 }
 
+
+def letter_replacer(word, dic):
+    '''
+    Функция заменяет символы в строке (word) согласно словарю (dic)
+    '''
+    for key, value in dic.items():
+        word = word.replace(key, value)
+    return word
+
+
 def file_renamer(extension='dxf', dic=legend, exception_patterns = None):
     '''
     Функция переименовывает файлы в текущей деректории.
@@ -100,9 +101,9 @@ def file_renamer(extension='dxf', dic=legend, exception_patterns = None):
     exception_patterns - словарь исключений, по умолчанию None
     '''
     for filename in os.listdir('.'):
-        if filename[-4:].lower() == '.' + extension:                                               # проверяем расширение 
+        if filename[-4:].lower() == '.' + extension.lower():                                       # проверяем расширение 
             old_filename = filename
-            if exception_patterns != None:                                                         # если указан словарь исключение, сначала отрабатываем его
+            if exception_patterns != None:                                                         # если указан словарь исключений, сначала отрабатываем его
                 for key, value in exception_patterns.items():
                     search_key = re.search(key, old_filename)
                     if search_key:                                                                 # если нашлись паттерны, меняем символы в паттернах
@@ -115,5 +116,5 @@ def file_renamer(extension='dxf', dic=legend, exception_patterns = None):
                 os.rename(filename, new_filename)                                                  # переименовываем файл
 
 
-#
+# вызываем функцию переименования с нужными параметрами
 file_renamer(exception_patterns=exception_patterns)
